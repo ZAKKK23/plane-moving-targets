@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>plane-moving-targets-stadium — VTP moving targets simulation</title>
+<link rel="stylesheet" href="../../assets/style.css" />
+</head>
+<body>
+
+<div class="hub-breadcrumb"><a href="../../index.html">&larr; All simulations</a></div>
+<nav class="tabs">
+  <button data-view="about" class="active">about</button>
+  <button data-view="sim">live simulation</button>
+  <button data-view="matlab">matlab version</button>
+</nav>
+
+<main>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="view-about" class="view active">
+    <h1 class="page-title">plane-moving-targets (stadium)</h1>
+    <p class="lede">A Voronoi Tessellation Population (VTP) agent simulation with moving targets, ported from MATLAB to a dependency-light browser build.</p>
+
+    <div class="badge-row">
+      <span class="badge">Delaunay / Voronoi</span>
+      <span class="badge">closed stadium-track target motion</span>
+      <span class="badge">MATLAB + JS ports</span>
+      <span class="badge">no build step</span>
+    </div>
+
+    <div class="prose">
+      <p>Targets here ride a closed <strong>stadium track</strong> — two straight sides joined by two half-circles, like a running track — instead of a straight line or a bounded corridor. You choose how many targets ride the loop; they're spaced evenly along it and all move together in one direction.</p>
+      <p>Every target shares a single arc-length position, offset by a constant spacing, so their along-track spacing is exact and never drifts — even while you change spacing, speed, or the track's own shape live.</p>
+      <p>Agents ("cells") respond to three local forces computed from their Delaunay neighborhood: a short-range <strong>repulsion</strong> from the nearest neighbor, an <strong>alignment</strong> pull toward neighbors heading the same way, and a <strong>homing</strong> pull toward whichever target is currently closest. Each step is capped by an estimate of the agent's own Voronoi cell size, so a crowded agent can't leap over its neighbors. Two constants shape that balance: <strong>&nu;</strong> (alignment strength) and <strong>L</strong> (interaction length scale) — both live-editable on the <em>live simulation</em> tab, alongside the track's own shape and the targets' spacing/speed.</p>
+
+      <h2>Two implementations, one model</h2>
+      <ul>
+        <li><code>index.html</code> (this page, <em>live simulation</em> tab) — a JavaScript/Canvas + D3-Delaunay port that runs directly in the browser, no install.</li>
+        <li><code>matlab/dynamics.m</code> — the original MATLAB implementation, browsable under the <em>matlab version</em> tab.</li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ================= LIVE SIMULATION ================= -->
+  <section id="view-sim" class="view">
+    <h1 class="page-title">Live simulation</h1>
+    <p class="lede">Runs entirely in your browser — Delaunay/Voronoi via D3, no server, no build step.</p>
+
+    <div class="sim-frame">
+      <div class="sim-topbar">
+        <span><b>VTP — Stadium Track</b> &nbsp;|&nbsp; ported from MATLAB (dynamics.m)</span>
+        <label class="targets-picker">targets:
+          <select id="numTargets">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4" selected>4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+            <option value="10">10</option>
+          </select>
+        </label>
+      </div>
+      <div class="sim-status" id="statusLine">t = 0 | 4 targets on stadium track</div>
+      <div class="sim-canvas-wrap"><canvas id="simCanvas"></canvas></div>
+
+      <div class="controls">
+        <div class="global-row">
+          <span class="label">Cells</span>
+          <div class="ctrl">Spd:
+            <input type="range" id="cellSpd" min="0" max="3" step="0.01" value="1" />
+            <span class="readout" id="cellSpdVal">1.00</span>
+          </div>
+          <div class="buttons">
+            <button id="btnPause">Pause</button>
+            <button id="btnReset" class="primary">Reset Targets</button>
+          </div>
+        </div>
+        <div class="global-row">
+          <span class="label">Dynamics</span>
+          <div class="ctrl">&nu;:
+            <input type="range" id="nuSlider" min="0" max="8" step="0.05" value="2.5" />
+            <span class="readout" id="nuVal">2.50</span>
+          </div>
+          <div class="ctrl">L:
+            <input type="range" id="lSlider" min="0.1" max="5" step="0.05" value="1" />
+            <span class="readout" id="lVal">1.00</span>
+          </div>
+        </div>
+        <div class="global-row">
+          <span class="label">Path</span>
+          <div class="ctrl">Straight len:
+            <input type="range" id="straightSlider" min="0" max="30" step="0.1" value="10" />
+            <span class="readout" id="straightVal">10.00</span>
+          </div>
+          <div class="ctrl">Corner radius:
+            <input type="range" id="radiusSlider" min="0" max="20" step="0.1" value="5" />
+            <span class="readout" id="radiusVal">5.00</span>
+          </div>
+        </div>
+        <div class="global-row">
+          <span class="label">Targets</span>
+          <div class="ctrl">Spacing:
+            <input type="range" id="spacingSlider" min="0" max="30" step="0.1" value="8" />
+            <span class="readout" id="spacingVal">8.00</span>
+          </div>
+          <div class="ctrl">Speed:
+            <input type="range" id="speedSlider" min="0" max="1" step="0.005" value="0.15" />
+            <span class="readout" id="speedVal">0.150</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MATLAB VERSION ================= -->
+  <section id="view-matlab" class="view">
+    <h1 class="page-title">MATLAB version</h1>
+    <p class="lede">The original implementation, in <code>matlab/</code>.</p>
+
+    <div class="prose">
+      <p>Requires base MATLAB only (<code>delaunayTriangulation</code>, <code>polyshape</code> — no extra toolboxes). Run:</p>
+      <div class="formula">cd matlab<br />matlab -r dynamics</div>
+      <p>...or open <code>dynamics.m</code> in the MATLAB editor and run it. You'll be prompted for the number of targets on the loop (1–10). An interactive figure then opens with a control panel (agent speed, &nu;, L, the track's straight length and corner radius, target spacing, and shared track speed — Apply / Pause / Reset Targets).</p>
+    </div>
+
+    <div class="file-layout">
+      <div class="file-list" id="fileList"></div>
+      <div>
+        <div class="code-view" id="codeView">Select a file…</div>
+        <p class="file-hint" id="fileHint"></p>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+
+<footer>plane-moving-targets (stadium) — MATLAB → browser port · view source on <a href="https://github.com/" target="_blank">GitHub</a></footer>
+
+<script src="../../assets/d3-delaunay.min.js"></script>
+<script src="assets/sim.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

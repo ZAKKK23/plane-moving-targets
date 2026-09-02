@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>plane-moving-targets — VTP moving targets simulation</title>
+<link rel="stylesheet" href="../../assets/style.css" />
+</head>
+<body>
+
+<div class="hub-breadcrumb"><a href="../../index.html">&larr; All simulations</a></div>
+<nav class="tabs">
+  <button data-view="about" class="active">about</button>
+  <button data-view="sim">live simulation</button>
+  <button data-view="matlab">matlab version</button>
+</nav>
+
+<main>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="view-about" class="view active">
+    <h1 class="page-title">plane-moving-targets</h1>
+    <p class="lede">A Voronoi Tessellation Population (VTP) agent simulation with moving targets, ported from MATLAB to a dependency-light browser build.</p>
+
+    <div class="badge-row">
+      <span class="badge">Delaunay / Voronoi</span>
+      <span class="badge">Tusi-couple target motion</span>
+      <span class="badge">MATLAB + JS ports</span>
+      <span class="badge">no build step</span>
+    </div>
+
+    <div class="prose">
+      <p>Every target in this model moves on a straight line without ever needing a straight-line equation: a small circle of radius <code>R/2</code> rolls, without slipping, around the inside of a fixed circle of radius <code>R</code>. A point fixed to the rim of the rolling circle then traces a perfect diameter of the outer circle — a <strong>Tusi couple</strong>, the same mechanism medieval astronomers used to generate linear motion out of two rotations.</p>
+      <p>Agents ("cells") respond to three local forces computed from their Delaunay neighborhood: a short-range <strong>repulsion</strong> from the nearest neighbor, an <strong>alignment</strong> pull toward neighbors heading the same way, and a <strong>homing</strong> pull toward whichever target is currently closest. Each step is capped by an estimate of the agent's own Voronoi cell size, so a crowded agent can't leap over its neighbors.</p>
+
+      <h2>Two implementations, one model</h2>
+      <ul>
+        <li><code>index.html</code> (this page, <em>live simulation</em> tab) — a JavaScript/Canvas + D3-Delaunay port that runs directly in the browser, no install.</li>
+        <li><code>matlab/dynamics.m</code> — the original MATLAB implementation, browsable under the <em>matlab version</em> tab.</li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ================= LIVE SIMULATION ================= -->
+  <section id="view-sim" class="view">
+    <h1 class="page-title">Live simulation</h1>
+    <p class="lede">Runs entirely in your browser — Delaunay/Voronoi via D3, no server, no build step.</p>
+
+    <div class="sim-frame">
+      <div class="sim-topbar">
+        <span><b>VTP — Moving Targets</b> &nbsp;|&nbsp; ported from MATLAB (dynamics.m)</span>
+        <label class="targets-picker">targets:
+          <select id="numTargets">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6" selected>6</option>
+          </select>
+        </label>
+      </div>
+      <div class="sim-status" id="statusLine">t = 0 | 6 moving targets (Tusi couple)</div>
+      <div class="sim-canvas-wrap"><canvas id="simCanvas"></canvas></div>
+
+      <div class="controls">
+        <div class="global-row">
+          <span class="label">Cells</span>
+          <div class="ctrl">Spd:
+            <input type="range" id="cellSpd" min="0" max="3" step="0.01" value="1" />
+            <span class="readout" id="cellSpdVal">1.00</span>
+          </div>
+          <div class="ctrl">Amp
+            <input type="range" id="amp" min="0" max="15" step="0.1" value="7" />
+            <span class="readout" id="ampVal">7.00</span>
+          </div>
+          <div class="buttons">
+            <button id="btnPause">Pause</button>
+            <button id="btnReset" class="primary">Reset Targets</button>
+          </div>
+        </div>
+        <div class="global-row">
+          <span class="label">Dynamics</span>
+          <div class="ctrl">&nu;:
+            <input type="range" id="nuSlider" min="0" max="8" step="0.05" value="2.5" />
+            <span class="readout" id="nuVal">2.50</span>
+          </div>
+          <div class="ctrl">L:
+            <input type="range" id="lSlider" min="0.1" max="5" step="0.05" value="1" />
+            <span class="readout" id="lVal">1.00</span>
+          </div>
+        </div>
+        <div class="target-rows" id="targetRows"></div>
+      </div>
+    </div>
+
+    <div class="sim-frame stats-frame">
+      <div class="sim-topbar">
+        <span><b>Cells near each target</b></span>
+        <div class="export-row">
+          <button id="btnExportCSV" class="export-btn">Export CSV (data)</button>
+          <button id="btnExportPNG" class="export-btn">Export PNG (image)</button>
+        </div>
+      </div>
+      <div class="stats-canvas-wrap"><canvas id="statsProfileCanvas"></canvas></div>
+    </div>
+
+    <div class="sim-frame stats-frame">
+      <div class="sim-topbar">
+        <span><b>Agents within radius R, over time</b> &nbsp;|&nbsp; one chart per R</span>
+        <div class="chart-legend" id="chartLegend"></div>
+      </div>
+      <div class="radius-charts-grid" id="radiusChartsGrid"></div>
+    </div>
+  </section>
+
+  <!-- ================= MATLAB VERSION ================= -->
+  <section id="view-matlab" class="view">
+    <h1 class="page-title">MATLAB version</h1>
+    <p class="lede">The original implementation, in <code>matlab/</code>.</p>
+
+    <div class="prose">
+      <p>Requires base MATLAB only (<code>delaunayTriangulation</code>, <code>polyshape</code> — no extra toolboxes). Run:</p>
+      <div class="formula">cd matlab<br />matlab -r dynamics</div>
+      <p>...or open <code>dynamics.m</code> in the MATLAB editor and run it. You'll be prompted for the number of targets (1–6), then an interactive figure opens with a live plot of the swarm plus a control panel (target ω, line orientation, shared amplitude, agent speed, Apply / Pause / Reset Targets).</p>
+    </div>
+
+    <div class="file-layout">
+      <div class="file-list" id="fileList"></div>
+      <div>
+        <div class="code-view" id="codeView">Select a file…</div>
+        <p class="file-hint" id="fileHint"></p>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+
+<footer>plane-moving-targets — MATLAB → browser port · view source on <a href="https://github.com/" target="_blank">GitHub</a></footer>
+
+<script src="../../assets/d3-delaunay.min.js"></script>
+<script src="assets/sim.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

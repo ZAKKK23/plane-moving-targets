@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>plane-moving-targets-aligned — VTP moving targets simulation</title>
+<link rel="stylesheet" href="../../assets/style.css" />
+</head>
+<body>
+
+<div class="hub-breadcrumb"><a href="../../index.html">&larr; All simulations</a></div>
+<nav class="tabs">
+  <button data-view="about" class="active">about</button>
+  <button data-view="sim">live simulation</button>
+  <button data-view="matlab">matlab version</button>
+</nav>
+
+<main>
+
+  <!-- ================= ABOUT ================= -->
+  <section id="view-about" class="view active">
+    <h1 class="page-title">plane-moving-targets (aligned)</h1>
+    <p class="lede">A Voronoi Tessellation Population (VTP) agent simulation with moving targets, ported from MATLAB to a dependency-light browser build.</p>
+
+    <div class="badge-row">
+      <span class="badge">Delaunay / Voronoi</span>
+      <span class="badge">aligned straight-line + sinusoidal target motion</span>
+      <span class="badge">MATLAB + JS ports</span>
+      <span class="badge">no build step</span>
+    </div>
+
+    <div class="prose">
+      <p>You choose a number of <strong>straight-line targets</strong> (0-5). Each one travels along its own fixed-height horizontal line — like several parallel lanes. One more target is always added on top of those: it moves <strong>sinusoidally in y</strong> (its own height, amplitude, and &omega; sliders) while still moving horizontally like all the others, so it travels in a wavy, oscillating path.</p>
+      <p>Every target — including the oscillating one — shares a single horizontal speed and a single shared x-coordinate. There's only one <code>x(t)</code> in the whole system, so all targets are aligned (exactly the same x) at every instant, not just when they start.</p>
+      <p>Agents ("cells") respond to three local forces computed from their Delaunay neighborhood: a short-range <strong>repulsion</strong> from the nearest neighbor, an <strong>alignment</strong> pull toward neighbors heading the same way, and a <strong>homing</strong> pull toward whichever target is currently closest. Each step is capped by an estimate of the agent's own Voronoi cell size, so a crowded agent can't leap over its neighbors. Two constants shape that balance: <strong>&nu;</strong> (alignment strength) and <strong>L</strong> (interaction length scale) — both live-editable on the <em>live simulation</em> tab, same as the shared horizontal speed.</p>
+
+      <h2>Two implementations, one model</h2>
+      <ul>
+        <li><code>index.html</code> (this page, <em>live simulation</em> tab) — a JavaScript/Canvas + D3-Delaunay port that runs directly in the browser, no install.</li>
+        <li><code>matlab/dynamics.m</code> — the original MATLAB implementation, browsable under the <em>matlab version</em> tab.</li>
+      </ul>
+
+    </div>
+  </section>
+
+  <!-- ================= LIVE SIMULATION ================= -->
+  <section id="view-sim" class="view">
+    <h1 class="page-title">Live simulation</h1>
+    <p class="lede">Runs entirely in your browser — Delaunay/Voronoi via D3, no server, no build step.</p>
+
+    <div class="sim-frame">
+      <div class="sim-topbar">
+        <span><b>VTP — Aligned Moving Targets</b> &nbsp;|&nbsp; ported from MATLAB (dynamics.m)</span>
+        <label class="targets-picker">straight targets:
+          <select id="numTargets">
+            <option value="0">0</option>
+            <option value="1">1</option>
+            <option value="2" selected>2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </label>
+      </div>
+      <div class="sim-status" id="statusLine">t = 0 | 3 aligned targets (2 straight + 1 sine)</div>
+      <div class="sim-canvas-wrap"><canvas id="simCanvas"></canvas></div>
+
+      <div class="controls">
+        <div class="global-row">
+          <span class="label">Cells</span>
+          <div class="ctrl">Spd:
+            <input type="range" id="cellSpd" min="0" max="3" step="0.01" value="1" />
+            <span class="readout" id="cellSpdVal">1.00</span>
+          </div>
+          <div class="buttons">
+            <button id="btnPause">Pause</button>
+            <button id="btnReset" class="primary">Reset Targets</button>
+          </div>
+        </div>
+        <div class="global-row">
+          <span class="label">Dynamics</span>
+          <div class="ctrl">&nu;:
+            <input type="range" id="nuSlider" min="0" max="8" step="0.05" value="2.5" />
+            <span class="readout" id="nuVal">2.50</span>
+          </div>
+          <div class="ctrl">L:
+            <input type="range" id="lSlider" min="0.1" max="5" step="0.05" value="1" />
+            <span class="readout" id="lVal">1.00</span>
+          </div>
+        </div>
+        <div class="global-row">
+          <span class="label">Motion</span>
+          <div class="ctrl">Horiz. speed (vx, shared):
+            <input type="range" id="vxSlider" min="0" max="1" step="0.005" value="0.15" />
+            <span class="readout" id="vxVal">0.150</span>
+          </div>
+        </div>
+        <div class="target-rows" id="targetRows"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MATLAB VERSION ================= -->
+  <section id="view-matlab" class="view">
+    <h1 class="page-title">MATLAB version</h1>
+    <p class="lede">The original implementation, in <code>matlab/</code>.</p>
+
+    <div class="prose">
+      <p>Requires base MATLAB only (<code>delaunayTriangulation</code>, <code>polyshape</code> — no extra toolboxes). Run:</p>
+      <div class="formula">cd matlab<br />matlab -r dynamics</div>
+      <p>...or open <code>dynamics.m</code> in the MATLAB editor and run it. You'll be prompted for the number of straight-line targets (0–5); one oscillating target is always added on top. An interactive figure then opens with a control panel (agent speed, &nu;, L, shared horizontal speed, each straight target's height, and the oscillating target's height/amplitude/&omega; — Apply / Pause / Reset Targets).</p>
+    </div>
+
+    <div class="file-layout">
+      <div class="file-list" id="fileList"></div>
+      <div>
+        <div class="code-view" id="codeView">Select a file…</div>
+        <p class="file-hint" id="fileHint"></p>
+      </div>
+    </div>
+  </section>
+
+
+</main>
+
+<footer>plane-moving-targets (aligned) — MATLAB → browser port · view source on <a href="https://github.com/" target="_blank">GitHub</a></footer>
+
+<script src="../../assets/d3-delaunay.min.js"></script>
+<script src="assets/sim.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
