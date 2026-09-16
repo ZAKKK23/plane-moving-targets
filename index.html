@@ -10,13 +10,13 @@
 
 <main>
   <h1 class="page-title">plane-moving-targets</h1>
-  <p class="lede">A Voronoi Tessellation Population (VTP) agent simulation with moving targets — five target-motion variants of the same underlying model, each with a MATLAB implementation and a dependency-light browser port.</p>
+  <p class="lede">A Voronoi Tessellation Population (VTP) agent simulation with moving targets — six target-motion variants of the same underlying model, each with a MATLAB implementation and a dependency-light browser port.</p>
 
   <div class="badge-row">
     <span class="badge">Delaunay / Voronoi</span>
     <span class="badge">MATLAB + JS ports</span>
     <span class="badge">no build step</span>
-    <span class="badge">5 target-motion variants</span>
+    <span class="badge">6 target-motion variants</span>
   </div>
 
   <div class="prose">
@@ -39,6 +39,10 @@
     <a class="force-card" href="variants/aligned/index.html" style="display:block; text-decoration:none; color:inherit;">
       <h3><span class="dot" style="background:#f2685f"></span>Aligned: one oscillating</h3>
       <p>A chosen number of straight-line targets on parallel horizontal lanes, plus one additional target that oscillates in y. All targets share a single x-coordinate at every instant.</p>
+    </a>
+    <a class="force-card" href="variants/aligned-asymmetric/index.html" style="display:block; text-decoration:none; color:inherit;">
+      <h3><span class="dot" style="background:#3fd0c9"></span>Aligned: asymmetric oscillation</h3>
+      <p>A variant of the above where the oscillating target doesn't swing symmetrically: it descends at angular frequency q and rises back up at n&times;q (n times faster, live-editable), both halves still genuine sine curves joined smoothly.</p>
     </a>
     <a class="force-card" href="variants/aligned-inverted/index.html" style="display:block; text-decoration:none; color:inherit;">
       <h3><span class="dot" style="background:#c792ea"></span>Aligned: multiple oscillating</h3>
